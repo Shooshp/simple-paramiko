@@ -94,15 +94,16 @@ class SSHConnection(object):
 
         return self.paramiko_client
 
-    def run_command(self, command: str, timeout: int = 60) -> List[str]:
+    def run_command(self, command: str, timeout: int = 60, sudo: bool = True) -> List[str]:
         """
         Executes command on target machine and return output as list of string.
         After execution procedure will check command exit code and will raise CommandFailed if command failed.
+        :param sudo: Run command with sudo privileges in case if user isn't root.
         :param command: String with command to execute.
         :param timeout: Timeout of command execution. In case if command will not return exit code before timeout expired exception will be raised.
         :return: List of output string.
         """
-        if self.username != 'root':
+        if self.username != 'root' and sudo is True:
             command = "sudo -S -p '' " + command
 
         if self.logfile is not None:
@@ -110,7 +111,7 @@ class SSHConnection(object):
 
         stdin, stdout, stderr = self.get_console().exec_command(command=command, timeout=timeout)
 
-        if self.username != 'root':
+        if self.username != 'root' and sudo is True:
             time.sleep(0.1)
             stdin.write(self.password + "\n")
             stdin.flush()
@@ -128,15 +129,16 @@ class SSHConnection(object):
             raise SSHCommandFailed(command, output, exitcode)
         return output
 
-    def run_command_ignore_fail(self, command: str, timeout: int = 60) -> List[str]:
+    def run_command_ignore_fail(self, command: str, timeout: int = 60, sudo: bool = True) -> List[str]:
         """
         Executes command on target machine and return output as list of string.
+        :param sudo: Run command with sudo privileges in case if user isn't root.
         :param command: String with command to execute.
         :param timeout: Timeout of command execution. In case if command will not return exit code before timeout expired exception will be raised.
         :return: List of output string.
         """
         try:
-            output: List[str] = self.run_command(command, timeout)
+            output: List[str] = self.run_command(command, timeout, sudo)
         except SSHCommandFailed as error:
             output = error.output
         return output
