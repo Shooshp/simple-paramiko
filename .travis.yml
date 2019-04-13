@@ -1,12 +1,32 @@
 language: python            # this works for Linux but is an error on macOS or Windows
 matrix:
   include:
-    - name: "Python 3.6 on Xenial Linux"
-      python: 3.6           # this works for Linux but is ignored on macOS or Windows
-      dist: xenial          # required for Python >= 3.6
-    - name: "Python 3.6 on Windows"
+    - name: "Python on Xenial Linux"
+      dist: xenial
+      python:
+        - "3.6"
+        - "3.7-dev"
+        - "3.8-dev"
+
+    - name: "Python on Windows"
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
       before_install: choco install python
       env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
-install: pip3 install --upgrade pip
+install:
+  # Initial preparation
+  - pip3 install --upgrade pip
+  - pip3 install codecov
+  - pip3 install -r requirements.txt
+script:
+  # Fast syntax check failures for more rapid feedback to submitters
+  # (Travis-oriented metatask that version checks Python, installs, runs.)
+  - inv travis.blacken
+  # I have this in my git pre-push hook, but contributors probably don't
+  - flake8
+  # All (including slow) tests, w/ coverage!
+  - inv coverage
+  # Ensure documentation builds, both sites, maxxed nitpicking
+  - inv sites
+after_success:
+  - codecov
