@@ -27,7 +27,7 @@ class SSHCommandFailed(Exception):
         self.exitcode = exitcode
 
     def __str__(self) -> str:
-        return "Command '%s' exited with %d.\nOutput:\n%s" % (self.command, self.exitcode, self.output)
+        return "Command '%s' exited with %d. Output: %s" % (self.command, self.exitcode, self.output)
 
 
 # noinspection PyBroadException
