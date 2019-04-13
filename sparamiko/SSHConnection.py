@@ -77,20 +77,21 @@ class SSHConnection(object):
         if self.is_connected():
             self.paramiko_client.close()
 
-    def get_console(self) -> paramiko.SSHClient:
+    def get_console(self, attempts: int = 60, retry_timeout: Union[int, float] = 2) -> paramiko.SSHClient:
         """
         Get or create and get ssh connection.
+        :param retry_timeout: Timeout between connection attempts.
+        :param attempts: How many attempts of reconnection should be before Exception.
         :return: Instance of paramiko client.
         """
         counter = 0
         while not self.is_connected():
             if counter > 0:
-                time.sleep(2)
+                time.sleep(retry_timeout)
             self.connect()
             counter += 1
-            if counter > 60:
+            if counter > attempts:
                 raise SSHConnectionError("Cannot login via SSH")
-
         return self.paramiko_client
 
     def run_command(self, command: str, timeout: int = 60, sudo: bool = True) -> List[str]:
