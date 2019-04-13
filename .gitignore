@@ -3,6 +3,9 @@
 /.idea/
 /venv/
 /venv3/
+/build/
+/dist/
+/simple_paramiko.egg-info
 .coverage
 .xml
 *.pyc
