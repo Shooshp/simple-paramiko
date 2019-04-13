@@ -1,0 +1,8 @@
+/.metadata/
+/.settings/
+/.idea/
+/venv/
+/venv3/
+.coverage
+.xml
+*.pyc
