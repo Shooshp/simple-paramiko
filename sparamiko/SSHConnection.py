@@ -56,8 +56,7 @@ class SSHConnection(object):
         state = False
         if self.paramiko_client is not None:
             try:
-                if self.paramiko_client.get_transport().is_active():
-                    state = True
+                state = self.paramiko_client.get_transport().is_active()
             except Exception:
                 pass
         return state
